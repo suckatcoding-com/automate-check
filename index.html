@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automation ROI Calculator</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .gradient-text {
+            background: linear-gradient(to right, #4f46e5, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        /* Custom Range Slider Styling */
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #4f46e5;
+            cursor: pointer;
+            margin-top: -6px; 
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #e2e8f0;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <nav class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-robot text-indigo-600 text-2xl"></i>
+                    <span class="font-bold text-xl tracking-tight text-slate-900">Auto<span class="text-indigo-600">Mate</span> Check</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button id="langToggle" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-sm font-medium transition-colors text-slate-600">
+                        <i class="fa-solid fa-globe"></i>
+                        <span id="langLabel">DE</span>
+                    </button>
+                    <div class="text-sm text-slate-500 hidden sm:block" data-i18n="navSubtitle">
+                        GitHub Pages Ready
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-8 max-w-6xl">
+        
+        <div class="text-center mb-10">
+            <h1 class="text-3xl md:text-4xl font-extrabold mb-3" data-i18n-html="headerTitle">
+                Sollte ich das <span class="gradient-text">automatisieren?</span>
+            </h1>
+            <p class="text-slate-600 max-w-2xl mx-auto" data-i18n="headerDesc">
+                Vergleiche den manuellen Aufwand mit der Zeit, die du für das Schreiben eines Skripts benötigst. Finde heraus, wann du den Break-Even-Point erreichst.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Inputs Column -->
+            <div class="lg:col-span-4 space-y-6">
+                
+                <!-- Manual Task Card -->
+                <div class="bg-white rounded-2xl shadow-lg border border-slate-100 p-6">
+                    <div class="flex items-center gap-2 mb-4 border-b border-slate-100 pb-3">
+                        <div class="bg-orange-100 p-2 rounded-lg text-orange-600">
+                            <i class="fa-solid fa-hand"></i>
+                        </div>
+                        <h2 class="font-semibold text-lg" data-i18n="manualCardTitle">Manuelle Aufgabe</h2>
+                    </div>
+
+                    <!-- Frequency -->
+                    <div class="mb-5">
+                        <label class="block text-sm font-medium text-slate-700 mb-2" data-i18n="frequencyLabel">Wie oft machst du das?</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="frequencyVal" value="5" min="1" class="w-20 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                            <select id="frequencyUnit" class="flex-1 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white">
+                                <option value="365" data-i18n="timesDay">mal pro Tag</option>
+                                <option value="52" selected data-i18n="timesWeek">mal pro Woche</option>
+                                <option value="12" data-i18n="timesMonth">mal pro Monat</option>
+                                <option value="1" data-i18n="timesYear">mal pro Jahr</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Duration per Task -->
+                    <div class="mb-2">
+                        <label class="block text-sm font-medium text-slate-700 mb-2" data-i18n="durationLabel">Dauer pro Ausführung</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="timePerTaskVal" value="10" min="1" class="w-20 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                            <select id="timePerTaskUnit" class="flex-1 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white">
+                                <option value="1/60" data-i18n="seconds">Sekunden</option>
+                                <option value="1" selected data-i18n="minutes">Minuten</option>
+                                <option value="60" data-i18n="hours">Stunden</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Automation Task Card -->
+                <div class="bg-white rounded-2xl shadow-lg border border-slate-100 p-6">
+                    <div class="flex items-center gap-2 mb-4 border-b border-slate-100 pb-3">
+                        <div class="bg-indigo-100 p-2 rounded-lg text-indigo-600">
+                            <i class="fa-solid fa-code"></i>
+                        </div>
+                        <h2 class="font-semibold text-lg" data-i18n="automationCardTitle">Automatisierung</h2>
+                    </div>
+
+                    <!-- Build Time -->
+                    <div class="mb-5">
+                        <label class="block text-sm font-medium text-slate-700 mb-2" data-i18n="buildTimeLabel">Zeitaufwand zur Erstellung</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="buildTimeVal" value="4" min="0.1" step="0.5" class="w-20 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                            <select id="buildTimeUnit" class="flex-1 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white">
+                                <option value="1" data-i18n="minutes">Minuten</option>
+                                <option value="60" selected data-i18n="hours">Stunden</option>
+                                <option value="1440" data-i18n="days">Tage</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Maintenance (Optional slider) -->
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                             <label class="block text-sm font-medium text-slate-700" data-i18n="maintenanceLabel">Wartung (pro Jahr)</label>
+                             <span id="maintenanceDisplay" class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded">0 Std</span>
+                        </div>
+                        <input type="range" id="maintenanceSlider" min="0" max="10" step="0.5" value="0" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                        <p class="text-xs text-slate-400 mt-1" data-i18n="maintenanceSub">Updates, Bugfixes, Anpassungen</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Results Column -->
+            <div class="lg:col-span-8 flex flex-col gap-6">
+                
+                <!-- Key Metrics -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Verdict Card -->
+                    <div class="bg-gradient-to-br from-indigo-600 to-blue-500 rounded-2xl shadow-lg p-5 text-white flex flex-col justify-between md:col-span-3">
+                        <div>
+                            <p class="text-indigo-100 text-sm uppercase tracking-wide font-semibold mb-1" data-i18n="verdictLabel">Ergebnis</p>
+                            <h3 id="verdictTitle" class="text-2xl font-bold">Lohnt sich!</h3>
+                        </div>
+                        <p id="verdictText" class="mt-2 text-indigo-50 opacity-90">
+                            Du sparst Zeit ab dem 2. Monat.
+                        </p>
+                    </div>
+
+                    <!-- Yearly Cost Manual -->
+                    <div class="bg-white rounded-2xl shadow border border-slate-100 p-4">
+                         <p class="text-xs text-slate-500 uppercase font-bold tracking-wider" data-i18n="manualYearlyLabel">Manuell / Jahr</p>
+                         <p id="manualYearly" class="text-2xl font-bold text-slate-800 mt-1">43 Std</p>
+                         <p class="text-xs text-slate-400 mt-1" data-i18n="timeSpentLabel">Zeitaufwand</p>
+                    </div>
+
+                    <!-- Automation ROI -->
+                    <div class="bg-white rounded-2xl shadow border border-slate-100 p-4">
+                         <p class="text-xs text-slate-500 uppercase font-bold tracking-wider" data-i18n="savedLabel">Gespart in 5 Jahren</p>
+                         <p id="savings5Years" class="text-2xl font-bold text-emerald-600 mt-1">+ 210 Std</p>
+                         <p class="text-xs text-slate-400 mt-1" data-i18n="netGainLabel">Netto-Gewinn</p>
+                    </div>
+                    
+                    <!-- Break Even -->
+                    <div class="bg-white rounded-2xl shadow border border-slate-100 p-4">
+                         <p class="text-xs text-slate-500 uppercase font-bold tracking-wider" data-i18n="breakEvenLabel">Break-Even</p>
+                         <p id="breakEvenPoint" class="text-2xl font-bold text-indigo-600 mt-1">1.2 Monate</p>
+                         <p class="text-xs text-slate-400 mt-1" data-i18n="amortizationLabel">Amortisationsdauer</p>
+                    </div>
+                </div>
+
+                <!-- Chart Container -->
+                <div class="bg-white rounded-2xl shadow-lg border border-slate-100 p-6 flex-grow flex flex-col">
+                    <h3 class="font-semibold text-lg text-slate-800 mb-4" data-i18n="chartTitle">Kumulierter Zeitaufwand (5 Jahre)</h3>
+                    <div class="relative w-full flex-grow min-h-[300px]">
+                        <canvas id="roiChart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-12 py-8">
+        <div class="container mx-auto px-4 text-center text-slate-500 text-sm">
+            <p data-i18n-html="footer">&copy; 2024 Automatisierungs-Rechner. Erstellt für mehr Freizeit.</p>
+        </div>
+    </footer>
+
+    <!-- Logic -->
+    <script>
+        // Translations Object
+        const translations = {
+            de: {
+                navSubtitle: "GitHub Pages Ready",
+                headerTitle: "Sollte ich das <span class='gradient-text'>automatisieren?</span>",
+                headerDesc: "Vergleiche den manuellen Aufwand mit der Zeit, die du für das Schreiben eines Skripts benötigst. Finde heraus, wann du den Break-Even-Point erreichst.",
+                manualCardTitle: "Manuelle Aufgabe",
+                frequencyLabel: "Wie oft machst du das?",
+                durationLabel: "Dauer pro Ausführung",
+                automationCardTitle: "Automatisierung",
+                buildTimeLabel: "Zeitaufwand zur Erstellung",
+                maintenanceLabel: "Wartung (pro Jahr)",
+                maintenanceSub: "Updates, Bugfixes, Anpassungen",
+                verdictLabel: "Ergebnis",
+                manualYearlyLabel: "Manuell / Jahr",
+                timeSpentLabel: "Zeitaufwand",
+                savedLabel: "Gespart in 5 Jahren",
+                netGainLabel: "Netto-Gewinn",
+                breakEvenLabel: "Break-Even",
+                amortizationLabel: "Amortisationsdauer",
+                chartTitle: "Kumulierter Zeitaufwand (5 Jahre)",
+                footer: "&copy; 2024 Automatisierungs-Rechner. Erstellt für mehr Freizeit.",
+                
+                // Select Options
+                timesDay: "mal pro Tag",
+                timesWeek: "mal pro Woche",
+                timesMonth: "mal pro Monat",
+                timesYear: "mal pro Jahr",
+                seconds: "Sekunden",
+                minutes: "Minuten",
+                hours: "Stunden",
+                days: "Tage",
+
+                // Dynamic Logic
+                chartManual: "Manuell (Kumuliert)",
+                chartAuto: "Mit Automatisierung (Kumuliert)",
+                year: "Jahr",
+                month: "Monat",
+                months: "Monate",
+                start: "Start",
+                verdictWorth: "Lohnt sich!",
+                verdictNotWorth: "Lohnt sich nicht",
+                verdictNoBrainer: "Ein No-Brainer. Du hast die Zeit in weniger als einem halben Jahr wieder drin.",
+                verdictMedium: "Es dauert etwas ({months} {monthsLabel}), aber langfristig sparst du Zeit.",
+                verdictLong: "Es lohnt sich langfristig, aber der ROI ist langsam.",
+                verdictNever: "Der Aufwand zur Automatisierung übersteigt die manuelle Arbeit in den nächsten 5 Jahren.",
+                unitMin: "Min",
+                unitStd: "Std",
+                moreThan5Years: "> 5 Jahre"
+            },
+            en: {
+                navSubtitle: "GitHub Pages Ready",
+                headerTitle: "Should I <span class='gradient-text'>Automate It?</span>",
+                headerDesc: "Compare manual effort with the time it takes to write a script. Find out when you hit the break-even point.",
+                manualCardTitle: "Manual Task",
+                frequencyLabel: "How often do you do it?",
+                durationLabel: "Duration per run",
+                automationCardTitle: "Automation",
+                buildTimeLabel: "Time to build",
+                maintenanceLabel: "Maintenance (per year)",
+                maintenanceSub: "Updates, bugfixes, adjustments",
+                verdictLabel: "Verdict",
+                manualYearlyLabel: "Manual / Year",
+                timeSpentLabel: "Time spent",
+                savedLabel: "Saved in 5 Years",
+                netGainLabel: "Net Gain",
+                breakEvenLabel: "Break-Even",
+                amortizationLabel: "Amortization period",
+                chartTitle: "Cumulative Time Spent (5 Years)",
+                footer: "&copy; 2024 Automation Calculator. Built for more free time.",
+                
+                // Select Options
+                timesDay: "times per day",
+                timesWeek: "times per week",
+                timesMonth: "times per month",
+                timesYear: "times per year",
+                seconds: "Seconds",
+                minutes: "Minutes",
+                hours: "Hours",
+                days: "Days",
+
+                // Dynamic Logic
+                chartManual: "Manual (Cumulative)",
+                chartAuto: "With Automation (Cumulative)",
+                year: "Year",
+                month: "Month",
+                months: "Months",
+                start: "Start",
+                verdictWorth: "Worth it!",
+                verdictNotWorth: "Not worth it",
+                verdictNoBrainer: "A no-brainer. You'll recoup the time in less than six months.",
+                verdictMedium: "It takes a while ({months} {monthsLabel}), but you save time in the long run.",
+                verdictLong: "It pays off eventually, but the ROI is slow.",
+                verdictNever: "The effort to automate exceeds the manual work over the next 5 years.",
+                unitMin: "Min",
+                unitStd: "Hrs",
+                moreThan5Years: "> 5 Years"
+            }
+        };
+
+        // DOM Elements
+        const inputs = [
+            'frequencyVal', 'frequencyUnit', 
+            'timePerTaskVal', 'timePerTaskUnit', 
+            'buildTimeVal', 'buildTimeUnit', 
+            'maintenanceSlider'
+        ];
+        
+        const maintenanceDisplay = document.getElementById('maintenanceDisplay');
+        const verdictTitle = document.getElementById('verdictTitle');
+        const verdictText = document.getElementById('verdictText');
+        const manualYearlyEl = document.getElementById('manualYearly');
+        const savings5YearsEl = document.getElementById('savings5Years');
+        const breakEvenEl = document.getElementById('breakEvenPoint');
+        const langToggle = document.getElementById('langToggle');
+        const langLabel = document.getElementById('langLabel');
+        
+        let chartInstance = null;
+        let currentLang = 'en';
+
+        // Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            initLanguage();
+
+            // Attach Input Listeners
+            inputs.forEach(id => {
+                document.getElementById(id).addEventListener('input', calculateAndDraw);
+                document.getElementById(id).addEventListener('change', calculateAndDraw);
+            });
+
+            // Attach Language Listener
+            langToggle.addEventListener('click', toggleLanguage);
+            
+            // Initial calc
+            calculateAndDraw();
+        });
+
+        function initLanguage() {
+            const browserLang = navigator.language || navigator.userLanguage;
+            // Default to DE if browser starts with 'de', else EN
+            currentLang = browserLang.startsWith('de') ? 'de' : 'en';
+            applyLanguage();
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'de' ? 'en' : 'de';
+            applyLanguage();
+        }
+
+        function applyLanguage() {
+            const t = translations[currentLang];
+
+            // 1. Update text content elements
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (t[key]) el.textContent = t[key];
+            });
+
+            // 2. Update HTML content elements (like headers with spans)
+            document.querySelectorAll('[data-i18n-html]').forEach(el => {
+                const key = el.getAttribute('data-i18n-html');
+                if (t[key]) el.innerHTML = t[key];
+            });
+
+            // 3. Update Button Label
+            langLabel.textContent = currentLang.toUpperCase();
+            
+            // 4. Update Document Title
+            document.title = currentLang === 'de' ? "Lohnt sich die Automatisierung?" : "Is Automation Worth It?";
+
+            // 5. Recalculate to update chart and verdict text
+            calculateAndDraw();
+        }
+
+        function formatHours(hours) {
+            const t = translations[currentLang];
+            if (Math.abs(hours) < 1) {
+                return Math.round(hours * 60) + " " + t.unitMin;
+            }
+            return Math.round(hours * 10) / 10 + " " + t.unitStd;
+        }
+
+        function calculateAndDraw() {
+            const t = translations[currentLang];
+
+            // 1. Get Values & Normalize to Hours/Year
+            
+            // Manual Side
+            const freqVal = parseFloat(document.getElementById('frequencyVal').value) || 0;
+            const freqUnit = parseFloat(document.getElementById('frequencyUnit').value); 
+            const totalExecutionsPerYear = freqVal * freqUnit;
+            
+            const taskTimeVal = parseFloat(document.getElementById('timePerTaskVal').value) || 0;
+            const taskTimeUnit = parseFloat(document.getElementById('timePerTaskUnit').value); 
+            const taskDurationHours = taskTimeVal * taskTimeUnit / 60;
+
+            const manualHoursPerYear = totalExecutionsPerYear * taskDurationHours;
+
+            // Automation Side
+            const buildVal = parseFloat(document.getElementById('buildTimeVal').value) || 0;
+            const buildUnit = parseFloat(document.getElementById('buildTimeUnit').value); 
+            const initialBuildHours = buildVal * buildUnit / 60;
+            
+            const maintenanceHoursPerYear = parseFloat(document.getElementById('maintenanceSlider').value);
+
+            // Update UI Slider Label
+            maintenanceDisplay.textContent = maintenanceHoursPerYear + " " + t.unitStd;
+
+            // 2. Calculations for Data Points (Monthly for 5 Years = 60 months)
+            const months = 60;
+            const labels = [];
+            const manualData = [];
+            const autoData = [];
+
+            let breakEvenMonth = -1;
+
+            for (let i = 0; i <= months; i++) {
+                // X Axis Labels
+                if (i === 0) labels.push(t.start);
+                else if (i % 12 === 0) labels.push(`${t.year} ${i/12}`);
+                else labels.push(''); 
+
+                // Manual
+                const manualAcc = (manualHoursPerYear / 12) * i;
+                manualData.push(manualAcc);
+
+                // Auto
+                const autoAcc = initialBuildHours + (maintenanceHoursPerYear / 12) * i;
+                autoData.push(autoAcc);
+
+                // Check for Break Even
+                if (breakEvenMonth === -1 && i > 0 && manualAcc >= autoAcc) {
+                    breakEvenMonth = i;
+                }
+            }
+
+            // 3. Update Text Metrics
+            manualYearlyEl.textContent = formatHours(manualHoursPerYear);
+            
+            const totalManual5Years = manualHoursPerYear * 5;
+            const totalAuto5Years = initialBuildHours + (maintenanceHoursPerYear * 5);
+            const netSavings = totalManual5Years - totalAuto5Years;
+
+            if (netSavings > 0) {
+                savings5YearsEl.textContent = "+ " + formatHours(netSavings);
+                savings5YearsEl.classList.remove('text-red-500');
+                savings5YearsEl.classList.add('text-emerald-600');
+            } else {
+                savings5YearsEl.textContent = formatHours(netSavings); 
+                savings5YearsEl.classList.remove('text-emerald-600');
+                savings5YearsEl.classList.add('text-red-500');
+            }
+
+            // Verdict Logic
+            if (breakEvenMonth !== -1) {
+                const monthLabel = breakEvenMonth === 1 ? t.month : t.months;
+                breakEvenEl.textContent = `${breakEvenMonth} ${monthLabel}`;
+                
+                verdictTitle.textContent = t.verdictWorth;
+                
+                if (breakEvenMonth <= 6) {
+                    verdictText.textContent = t.verdictNoBrainer;
+                } else if (breakEvenMonth <= 24) {
+                    let msg = t.verdictMedium;
+                    msg = msg.replace('{months}', breakEvenMonth).replace('{monthsLabel}', monthLabel);
+                    verdictText.textContent = msg;
+                } else {
+                    verdictText.textContent = t.verdictLong;
+                }
+            } else {
+                breakEvenEl.textContent = t.moreThan5Years;
+                verdictTitle.textContent = t.verdictNotWorth;
+                verdictText.textContent = t.verdictNever;
+            }
+
+            // 4. Update Chart
+            updateChart(labels, manualData, autoData, t);
+        }
+
+        function updateChart(labels, manualData, autoData, t) {
+            const ctx = document.getElementById('roiChart').getContext('2d');
+
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: t.chartManual,
+                            data: manualData,
+                            borderColor: '#ea580c', // Orange
+                            backgroundColor: 'rgba(234, 88, 12, 0.1)',
+                            borderWidth: 3,
+                            pointRadius: 0,
+                            pointHoverRadius: 6,
+                            fill: true,
+                            tension: 0
+                        },
+                        {
+                            label: t.chartAuto,
+                            data: autoData,
+                            borderColor: '#4f46e5', // Indigo
+                            backgroundColor: 'rgba(79, 70, 229, 0.05)',
+                            borderWidth: 3,
+                            pointRadius: 0,
+                            pointHoverRadius: 6,
+                            fill: true,
+                            tension: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += Math.round(context.parsed.y) + ' ' + t.unitStd;
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20,
+                                font: {
+                                    family: "'Inter', sans-serif"
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                autoSkip: true,
+                                maxTicksLimit: 6,
+                                font: { family: "'Inter', sans-serif" }
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: t.chartTitle // using dynamic title if desired for axis, currently reusing chartTitle var which is main title
+                            },
+                            grid: {
+                                borderDash: [5, 5],
+                                color: '#f1f5f9'
+                            },
+                            ticks: {
+                                font: { family: "'Inter', sans-serif" }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
