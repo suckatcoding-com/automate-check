@@ -18,7 +18,7 @@ const translations = {
         breakEvenLabel: "Break-Even",
         amortizationLabel: "Amortisationsdauer",
         chartTitle: "Kumulierter Zeitaufwand (5 Jahre)",
-        footer: "&copy; 2024 Automatisierungs-Rechner. Erstellt für mehr Freizeit.",
+        footer: "Erstellt für mehr Freizeit.",
         
         // Select Options
         timesDay: "mal pro Tag",
@@ -65,7 +65,7 @@ const translations = {
         breakEvenLabel: "Break-Even",
         amortizationLabel: "Amortization period",
         chartTitle: "Cumulative Time Spent (5 Years)",
-        footer: "&copy; 2024 Automation Calculator. Built for more free time.",
+        footer: "Built for more free time.",
         
         // Select Options
         timesDay: "times per day",
