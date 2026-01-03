@@ -21,17 +21,33 @@ let currentLang = 'en';
 
 // Initialization
 document.addEventListener('DOMContentLoaded', () => {
+    // If the page was opened with query params, apply them to inputs first
+    readParamsToInputs();
+
     initLanguage();
 
-    // Attach Input Listeners
+    // Attach Input Listeners that also update the URL
+    const onInputChange = () => { 
+        calculateAndDraw(); 
+        updateURLFromInputs(); 
+    };
+    
     inputs.forEach(id => {
-        document.getElementById(id).addEventListener('input', calculateAndDraw);
-        document.getElementById(id).addEventListener('change', calculateAndDraw);
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener('input', onInputChange);
+        el.addEventListener('change', onInputChange);
     });
 
     // Attach Language Listener
-    langToggle.addEventListener('click', toggleLanguage);
+    langToggle.addEventListener('click', () => { 
+        toggleLanguage(); 
+        updateURLFromInputs();
+     });
     
+    // Ensure URL reflects current values (useful when no params were present)
+    updateURLFromInputs();
+
     // Initial calc
     calculateAndDraw();
 });
@@ -275,4 +291,37 @@ function updateChart(labels, manualData, autoData, t) {
             }
         }
     });
+}
+
+// Read GET parameters and apply to inputs (if present)
+function readParamsToInputs() {
+    try {
+        const params = new URLSearchParams(window.location.search);
+        inputs.forEach(id => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const val = params.get(id);
+            if (val !== null) {
+                el.value = val;
+            }
+        });
+    } catch (e) {
+        // ignore malformed URLs
+    }
+}
+
+// Update the browser URL (no reload) with current input values
+function updateURLFromInputs() {
+    try {
+        const params = new URLSearchParams();
+        inputs.forEach(id => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            params.set(id, String(el.value));
+        });
+        const newUrl = window.location.pathname + '?' + params.toString();
+        history.replaceState(null, '', newUrl);
+    } catch (e) {
+        // ignore
+    }
 }
