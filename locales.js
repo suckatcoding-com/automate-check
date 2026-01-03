@@ -18,6 +18,7 @@ const translations = {
         breakEvenLabel: "Break-Even",
         amortizationLabel: "Amortisationsdauer",
         chartTitle: "Kumulierter Zeitaufwand (5 Jahre)",
+        chartYAxis: "Kumulierter Zeitaufwand in Stunden",
         footer: "Erstellt für mehr Freizeit - ein Service von suckatcoding.com",
         
         // Select Options
@@ -65,6 +66,7 @@ const translations = {
         breakEvenLabel: "Break-Even",
         amortizationLabel: "Amortization period",
         chartTitle: "Cumulative Time Spent (5 Years)",
+        chartYAxis: "Cumulative Time Spent in hours",
         footer: "Built for more free time - a service by suckatcoding.com",
         
         // Select Options

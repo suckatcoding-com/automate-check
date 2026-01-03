@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
         calculateAndDraw(); 
         updateURLFromInputs(); 
     };
-    
+
     inputs.forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
@@ -266,10 +266,10 @@ function updateChart(labels, manualData, autoData, t) {
             scales: {
                 x: {
                     grid: {
-                        display: false
+                        display: true
                     },
                     ticks: {
-                        autoSkip: true,
+                        autoSkip: false,
                         maxTicksLimit: 6,
                         font: { family: "'Inter', sans-serif" }
                     }
@@ -278,7 +278,7 @@ function updateChart(labels, manualData, autoData, t) {
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: t.chartTitle // using dynamic title if desired for axis, currently reusing chartTitle var which is main title
+                        text: t.chartYAxis
                     },
                     grid: {
                         borderDash: [5, 5],
