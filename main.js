@@ -15,6 +15,7 @@ const savings5YearsEl = document.getElementById('savings5Years');
 const breakEvenEl = document.getElementById('breakEvenPoint');
 const langToggle = document.getElementById('langToggle');
 const langLabel = document.getElementById('langLabel');
+const resetBtn = document.getElementById('resetBtn');
 
 let chartInstance = null;
 let currentLang = 'en';
@@ -44,6 +45,12 @@ document.addEventListener('DOMContentLoaded', () => {
         toggleLanguage(); 
         updateURLFromInputs();
      });
+
+    // Attach Reset Listener
+    resetBtn.addEventListener('click', () => {
+        resetToDefaults();
+        updateURLFromInputs();
+    });
     
     // Ensure URL reflects current values (useful when no params were present)
     updateURLFromInputs();
@@ -324,4 +331,33 @@ function updateURLFromInputs() {
     } catch (e) {
         // ignore
     }
+}
+
+// Reset inputs to their default values and refresh UI
+function resetToDefaults() {
+    const defaults = {
+        frequencyVal: '5',
+        frequencyUnit: '52',
+        timePerTaskVal: '10',
+        timePerTaskUnit: '1',
+        buildTimeVal: '4',
+        buildTimeUnit: '60',
+        maintenanceSlider: '0'
+    };
+
+    Object.keys(defaults).forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.value = defaults[id];
+        // also trigger input events for any listeners
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+
+    // Update maintenance display and recalc
+    const maintenanceSlider = document.getElementById('maintenanceSlider');
+    const t = translations[currentLang];
+    maintenanceDisplay.textContent = (maintenanceSlider.value || '0') + ' ' + (t ? t.unitStd : 'Std');
+
+    calculateAndDraw();
 }
